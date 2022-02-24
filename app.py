@@ -32,12 +32,17 @@ def proxy(args):
         headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
         response = Response(resp.content, resp.status_code, headers)
         return response
-    elif request.method == 'DELETE':
-        resp = requests.delete(f'{SITE_NAME}{path}').content
-        excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
-        headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
-        response = Response(resp.content, resp.status_code, headers)
-        return response
+    else:
+        method=request.method.lower()
+        if hasattr(requests,method):
+            resp=getattr(requests,method)(f'{SITE_NAME}{path}').content
+            excluded_headers = ['content-encoding', 'content-length', 'transfer-encoding', 'connection']
+            headers = [(name, value) for (name, value) in resp.raw.headers.items() if name.lower() not in excluded_headers]
+            response = Response(resp.content, resp.status_code, headers)
+            return response
+        else:
+            print('not support')
+
 
 
 if __name__ == '__main__':
